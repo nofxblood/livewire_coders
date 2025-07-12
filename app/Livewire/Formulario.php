@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Livewire\Forms\PostCreateForm;
 use App\Models\Category;
 use App\Models\Post;
 use App\Models\Tag;
@@ -21,13 +22,7 @@ class Formulario extends Component
     //     'postCreate.category_id' => 'Categoría'
     // ])]
 
-    public $postCreate = [
-        'title' => '',
-        'content' => '',
-        'category_id' => '',
-        'tags' => []
-    ];
-
+    public PostCreateForm $postCreate;
     public $posts;
     public $postEditId = '';
     public $postEdit = [
@@ -39,28 +34,6 @@ class Formulario extends Component
 
     public $open = false;
 
-    public function rules()
-    {
-        return [
-            'postCreate.title' => 'required',
-            'postCreate.content' => 'required',
-            'postCreate.category_id' => 'required|exists:categories,id',
-            'postCreate.tags' => 'required|array',
-        ];
-    }
-    public function messages()
-    {
-        return [
-            'postCreate.title.required' => 'El campo Título necesita completarse',
-        ];
-    }
-    public function validationAttributes()
-    {
-        return [
-            'postCreate.category_id' => 'Categorías',
-        ];
-    }
-
     public function mount()
     {
         $this->categories = Category::all();
@@ -71,33 +44,15 @@ class Formulario extends Component
 
     public function save()
     {
-        $this->validate();
+        $this->postCreate->validate();
 
-        // $this->validate([
-        //     'title' => 'required',
-        //     'content' => 'required',
-        //     'category_id' => 'required|exist:categories_id',
-        //     'selectedTags' => 'required|array'
-        // ], [
-        //     'title.required' => 'El campo titulo es requerido',
-        // ], [
-        //     'category_id' => 'Categoría',
-        // ]);
+        $post = Post::create(
+            $this->postCreate->only('title','content','category_id','tags')
+        );
 
-        // $post = Post::create([
-        //     'category_id' => $this->category_id,
-        //     'title' => $this->title,
-        //     'content' => $this->content
-        // ]);
+        $post->tags()->attach($this->postCreate->tags);
 
-        $post = Post::create([
-            'category_id' => $this->postCreate['category_id'],
-            'title' => $this->postCreate['title'],
-            'content' => $this->postCreate['content'],
-        ]);
-        $post->tags()->attach($this->postCreate['tags']);
-
-        $this->reset(['postCreate']);
+        $this->postCreate->reset();
 
         $this->posts = Post::all();
     }
