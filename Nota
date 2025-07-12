@@ -1,0 +1,30 @@
+#[Rule]  --> reglas
+#[On] -->
+#[Reactive] --> puede actualizar los datos tanto en el componente padre como el hijo
+:name="$name" --> los ":" hago referencia que manejare una variable php
+ #[Modelable] --> es parecido a reactive pero visebersa como hijo como padres se puede modificar
+ @livewire('contador',[], key('contador-5')) ---> variables identificativas los key a la 3er sitio , , ,
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

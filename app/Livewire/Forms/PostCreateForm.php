@@ -2,13 +2,14 @@
 
 namespace App\Livewire\Forms;
 
+use App\Models\Post;
 use Livewire\Attributes\Rule;
 use Livewire\Attributes\Validate;
 use Livewire\Form;
 
 class PostCreateForm extends Form
 {
-    #[Rule('required')]
+    #[Rule('required|min:3')]
     public $title;
 
     #[Rule('required')]
@@ -19,4 +20,17 @@ class PostCreateForm extends Form
 
     #[Rule('required|array')]
     public $tags = [];
+
+    public function save ()
+    {
+        $this->validate();
+
+        $post = Post::create(
+            $this->only('title','content','category_id','tags')
+        );
+
+        $post->tags()->attach($this->tags);
+
+        $this->reset();
+    }
 }

@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Livewire\Forms\PostCreateForm;
+use App\Livewire\Forms\PostEditForm;
 use App\Models\Category;
 use App\Models\Post;
 use App\Models\Tag;
@@ -23,17 +24,10 @@ class Formulario extends Component
     // ])]
 
     public PostCreateForm $postCreate;
+    public PostEditForm $postEdit;
     public $posts;
-    public $postEditId = '';
-    public $postEdit = [
-        'category_id' => '',
-        'title' => '',
-        'content' => '',
-        'tags' => []
-    ];
-
-    public $open = false;
-
+    
+    //ciclo de vida del componente
     public function mount()
     {
         $this->categories = Category::all();
@@ -44,56 +38,25 @@ class Formulario extends Component
 
     public function save()
     {
-        $this->postCreate->validate();
-
-        $post = Post::create(
-            $this->postCreate->only('title','content','category_id','tags')
-        );
-
-        $post->tags()->attach($this->postCreate->tags);
-
-        $this->postCreate->reset();
-
+        $this->postCreate->save();
         $this->posts = Post::all();
+
+        $this->dispatch('post-created','Nuevo articulo creado');
     }
 
     public function edit($postId)
     {
         $this->resetValidation();
+        $this->postEdit->edit($postId);
 
-        $this->open = true;
-
-        $this->postEditId = $postId;
-
-        $post = Post::find($postId);
-
-        $this->postEdit['category_id'] = $post->category_id;
-        $this->postEdit['title'] = $post->title;
-        $this->postEdit['content'] = $post->content;
-
-        $this->postEdit['tags'] = $post->tags->pluck('id')->toArray();
     }
 
     public function update()
     {
-        $this->validate([
-            'postEdit.title' => 'required',
-            'postEdit.content' => 'required',
-            'postEdit.category_id' => 'required|exists:categories,id',
-            'postEdit.tags' => 'required|array'
-        ]);
-
-        $post = Post::find($this->postEditId);
-        $post->update([
-            'category_id' => $this->postEdit['category_id'],
-            'title' => $this->postEdit['title'],
-            'content' => $this->postEdit['content'],
-        ]);     
-
-        $post->tags()->sync($this->postEdit['tags']);
-
-        $this->reset(['postEditId', 'postEdit', 'open']);
+        $this->postEdit->update();
         $this->posts = Post::all();
+
+        $this->dispatch('post-created','articulo actualizado','success');
     }
 
     public function destroy($postId)
@@ -101,6 +64,8 @@ class Formulario extends Component
         $post = Post::find($postId);
         $post->delete();
         $this->posts = Post::all();
+
+        $this->dispatch('post-created','Articulo eliminado');
     }
 
     public function render()

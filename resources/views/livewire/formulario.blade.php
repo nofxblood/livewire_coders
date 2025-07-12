@@ -7,7 +7,7 @@
                 <x-label>
                     Nombre
                 </x-label>
-                <x-input class="w-full" wire:model="postCreate.title" />
+                <x-input class="w-full" wire:model.live="postCreate.title" />
                 <x-input-error for="postCreate.title" />
             </div>
 
@@ -83,7 +83,7 @@
     </div>
 
     <form wire:submit="update">
-        <x-dialog-modal wire:model="open">
+        <x-dialog-modal wire:model="postEdit.open">
             <x-slot name="title">
                 Actualizar Post
             </x-slot>
@@ -101,7 +101,7 @@
                     <x-label>
                         Contenido
                     </x-label>
-                    <x-textarea class="w-full" wire:model="postEdit.content" ></x-textarea>
+                    <x-textarea class="w-full" wire:model="postEdit.content"></x-textarea>
                     <x-input-error for="postEdit.content" />
                 </div>
 
@@ -134,12 +134,12 @@
                             </li>
                         @endforeach
                     </ul>
-                     <x-input-error for="postEdit.tags" />
+                    <x-input-error for="postEdit.tags" />
                 </div>
             </x-slot>
             <x-slot name="footer">
                 <div class="flex justify-end">
-                    <x-danger-button class="mr-2" wire:click="$set('open', false)">
+                    <x-danger-button class="mr-2" wire:click="$set('postEdit.open', false)">
                         Cancelar
                     </x-danger-button>
                     <x-button>
@@ -150,4 +150,13 @@
             </x-slot>
         </x-dialog-modal>
     </form>
+
+    @push('js')
+        <script>
+            Livewire.on('post-created', function(comment) {
+                console.log(comment[0]);
+            });
+        </script>
+    @endpush
+
 </div>
